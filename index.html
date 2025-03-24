@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Search Algorithm</title>
+    <style>
+        /* Overall document styling */
+        :root {
+            --primary: #2c3e50;
+            --mint: #3cb371;
+            --light-mint: #e0f5ee;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #f9f9f9;
+            color: var(--primary);
+            line-height: 1.6;
+        }
+        
+        /* Header styling - Minimalist Mint Green */
+        header {
+            background: var(--mint);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 500;
+            color: white;
+            letter-spacing: 1px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: var(--mint);
+            margin: 1.5rem 0 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--light);
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        /* Main content */
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Info section */
+        .info-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+        
+        .info-section p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+        
+        .code-block {
+            background: #f4f4f4;
+            border-left: 4px solid var(--mint);
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+        }
+        
+        /* Visual demo section */
+        .demo-section {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .input-box, .output-box {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+        
+        .input-box h3, .output-box h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--mint);
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: var(--mint);
+            outline: none;
+        }
+        
+        button {
+            background: var(--mint);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+        
+        button:hover {
+            background: #2a9058;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 5px var(--shadow);
+        }
+        
+        /* Array visualization */
+        .array-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .element {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid var(--mint);
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .element::after {
+            content: attr(data-index);
+            position: absolute;
+            bottom: -20px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .element.checking {
+            background: #ffeb3b;
+            transform: scale(1.1);
+            border-color: #ff9800;
+            z-index: 1;
+        }
+        
+        .element.found {
+            background: var(--mint);
+            color: white;
+            transform: scale(1.15);
+            border-color: #2a9058;
+            z-index: 2;
+        }
+        
+        #message {
+            font-weight: bold;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        #message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        #message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        #message.info {
+            background: #e0f5ee;
+            color: #2a9058;
+            border: 1px solid #b1dfca;
+        }
+        
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1.15); }
+            50% { transform: translateY(-10px) scale(1.2); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .element {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Linear Search Algorithm</h1>
+        <p class="subtitle">A step-by-step visualization</p>
+    </header>
+    
+    <main>
+        <div class="container">
+            <section class="info-section">
+                <h2>What is Linear Search?</h2>
+                <p>Linear search is the simplest searching algorithm that checks each element in the list sequentially until the desired element is found or the list ends.</p>
+                
+                <p>Unlike more complex algorithms, linear search works on both sorted and unsorted data, making it versatile but less efficient for large datasets.</p>
+                
+                <div class="code-block">
+                    function linearSearch(arr, target) {<br>
+                    &nbsp;&nbsp;for (let i = 0; i < arr.length; i++) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;// Check if current element is the target<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;if (arr[i] === target) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return i; // Return the index if found<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                    &nbsp;&nbsp;}<br>
+                    &nbsp;&nbsp;return -1; // Return -1 if not found<br>
+                    }
+                </div>
+            </section>
+            
+            <section class="demo-section">
+                <div class="input-box">
+                    <h3>Setup Your Array</h3>
+                    <p>Enter numbers separated by spaces:</p>
+                    <input type="text" id="numbersInput" placeholder="e.g. 5 8 12 23 45">
+                    <button id="setArrayBtn">Set Array</button>
+                    
+                    <p>Enter the number to search:</p>
+                    <input type="number" id="target" placeholder="Enter a number">
+                    <button id="searchBtn">Start Search</button>
+                </div>
+                
+                <div class="output-box">
+                    <h3>Visualization</h3>
+                    <div class="array-container" id="arrayContainer"></div>
+                    <div id="message" class="info">Enter your array and target value to begin</div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <script>
+        // Variables
+        let numbers = [];
+        let searchInterval = null;
+        
+        // DOM elements
+        const numbersInput = document.getElementById("numbersInput");
+        const targetInput = document.getElementById("target");
+        const setArrayBtn = document.getElementById("setArrayBtn");
+        const searchBtn = document.getElementById("searchBtn");
+        const arrayContainer = document.getElementById("arrayContainer");
+        const messageDiv = document.getElementById("message");
+        
+        // Event listeners
+        setArrayBtn.addEventListener("click", setNumbers);
+        searchBtn.addEventListener("click", startLinearSearch);
+        
+        // Initialize with sample array
+        numbersInput.value = "4 2 7 10 8 3 15";
+        setNumbers();
+        
+        // Functions
+        function setNumbers() {
+            const input = numbersInput.value.trim();
+            const numArray = input.split(" ")
+                .map(num => parseInt(num.trim()))
+                .filter(num => !isNaN(num));
+            
+            if (numArray.length === 0) {
+                messageDiv.innerText = "Please enter at least one valid number.";
+                messageDiv.className = "error";
+                return;
+            }
+            
+            numbers = numArray;
+            createArrayUI();
+            messageDiv.innerText = "Array set successfully! Now enter a number to search.";
+            messageDiv.className = "info";
+        }
+        
+        function createArrayUI() {
+            arrayContainer.innerHTML = "";
+            
+            numbers.forEach((num, index) => {
+                const div = document.createElement("div");
+                div.classList.add("element");
+                div.innerText = num;
+                div.setAttribute("data-index", index);
+                arrayContainer.appendChild(div);
+            });
+        }
+        
+        function startLinearSearch() {
+            // Clear any previous search
+            if (searchInterval) {
+                clearInterval(searchInterval);
+            }
+            
+            let target = parseInt(targetInput.value);
+            if (isNaN(target)) {
+                messageDiv.innerText = "Please enter a valid number to search.";
+                messageDiv.className = "error";
+                return;
+            }
+            
+            if (numbers.length === 0) {
+                messageDiv.innerText = "Please set the array first.";
+                messageDiv.className = "error";
+                return;
+            }
+            
+            // Reset UI
+            createArrayUI();
+            messageDiv.innerText = "Searching...";
+            messageDiv.className = "info";
+            
+            // Perform linear search with visualization
+            const elements = document.querySelectorAll(".element");
+            let i = 0;
+            
+            searchInterval = setInterval(() => {
+                if (i >= numbers.length) {
+                    clearInterval(searchInterval);
+                    messageDiv.innerText = `Number ${target} was not found in the array.`;
+                    messageDiv.className = "error";
+                    arrayContainer.style.animation = "shake 0.5s ease-in-out";
+                    setTimeout(() => {
+                        arrayContainer.style.animation = "";
+                    }, 500);
+                    return;
+                }
+                
+                // Remove previous styling
+                for (let j = 0; j < elements.length; j++) {
+                    elements[j].classList.remove("checking");
+                }
+                
+                // Add current checking style
+                elements[i].classList.add("checking");
+                
+                // Check if current element is the target
+                if (numbers[i] === target) {
+                    clearInterval(searchInterval);
+                    elements[i].classList.remove("checking");
+                    elements[i].classList.add("found");
+                    messageDiv.innerText = `Found ${target} at index ${i}!`;
+                    messageDiv.className = "success";
+                    elements[i].style.animation = "bounce 0.8s ease-in-out";
+                    return;
+                }
+                
+                i++;
+            }, 800); // Speed of animation (milliseconds)
+        }
+        
+        // Handle Enter key press
+        targetInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                startLinearSearch();
+            }
+        });
+        
+        numbersInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                setNumbers();
+            }
+        });
+    </script>
+</body>
+</html>
